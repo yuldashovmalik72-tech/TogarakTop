@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api.js";
 import { CATEGORY_OPTIONS, DAYS } from "../lib/format.js";
-import FileUploadField from "../components/FileUploadField.jsx";
 
 const STEPS = ["Turi", "Asosiy", "Rasm", "Narx", "Manzil", "Guruh", "Tayyor"];
 
@@ -70,9 +69,12 @@ export default function CreateCircle() {
     setStep((s) => Math.max(s - 1, 0));
   }
 
-  function handleImageChange(e) {
-    const files = Array.from(e.target.files || []).slice(0, 2);
-    update("images", files);
+  function setImageUrl(idx, value) {
+    setForm((f) => {
+      const images = [...(f.images || [])];
+      images[idx] = value;
+      return { ...f, images };
+    });
   }
 
   async function createCourseCenter() {
@@ -138,7 +140,8 @@ export default function CreateCircle() {
       if (form.contactPhone) fd.append("contactPhone", form.contactPhone);
       if (form.contactTelegram) fd.append("contactTelegram", form.contactTelegram);
       if (form.type === "KURS") fd.append("courseCenterId", form.courseCenterId);
-      form.images.forEach((file) => fd.append("images", file));
+      const imageUrls = (form.images || []).map((u) => (u || "").trim()).filter((u) => /^https?:\/\//i.test(u));
+      if (imageUrls.length) fd.append("imageUrls", JSON.stringify(imageUrls));
 
       const res = await api.post("/circles", fd);
       setCreatedCircleId(res.data.data.id);
@@ -332,29 +335,30 @@ export default function CreateCircle() {
           </div>
         )}
 
-        {/* 2. RASM */}
+        {/* 2. RASM — URL (Render free uchun fayl o'rniga) */}
         {step === 2 && (
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-lg font-bold text-ink">Rasmlar (ixtiyoriy)</h2>
-            <p className="text-sm text-muted">Maksimum 2 ta rasm yuklashingiz mumkin</p>
-            <FileUploadField
-              kind="image"
-              accept="image/*"
-              multiple
-              value={form.images}
-              onChange={handleImageChange}
-              label="Rasm(lar) tanlash"
-              hint="Hech qanday rasm tanlanmagan"
-            />
-            {form.images.length > 0 && (
+            <p className="text-sm text-muted">
+              Rasmni ImgBB, Cloudinary yoki boshqa joyga yuklab, <strong>to&apos;liq https://...</strong> havolasini kiriting.
+              Maksimum 2 ta. Render free diskda fayl saqlanmaydi — shu sabab URL ishlatiladi.
+            </p>
+            {[0, 1].map((idx) => (
+              <label key={idx} className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-soft">Rasm URL {idx + 1}</span>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={form.images[idx] || ""}
+                  onChange={(e) => setImageUrl(idx, e.target.value)}
+                  className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+                />
+              </label>
+            ))}
+            {(form.images || []).some((u) => u && /^https?:\/\//i.test(u)) && (
               <div className="flex gap-3">
-                {form.images.map((file, i) => (
-                  <img
-                    key={i}
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="h-24 w-24 rounded-xl object-cover"
-                  />
+                {(form.images || []).filter((u) => u && /^https?:\/\//i.test(u)).map((url, i) => (
+                  <img key={i} src={url} alt="" className="h-24 w-24 rounded-xl object-cover border border-line" />
                 ))}
               </div>
             )}

@@ -32,6 +32,7 @@ export default function EditCircle() {
         priceAmount: c.priceAmount || "",
         currency: c.currency || "UZS",
         pricePeriod: c.pricePeriod || "MONTHLY",
+        images: [...(c.images || []), "", ""].slice(0, 2),
       });
     }).catch(() => setError("To'garak topilmadi"));
   }, [id]);
@@ -45,7 +46,11 @@ export default function EditCircle() {
     setSaving(true);
     setError("");
     try {
-      await api.patch(`/circles/${id}`, form);
+      const payload = {
+        ...form,
+        images: (form.images || []).map((u) => (u || "").trim()).filter(Boolean).slice(0, 2),
+      };
+      await api.patch(`/circles/${id}`, payload);
       push("O'zgarishlar saqlandi, qayta moderatsiyaga yuborildi");
       navigate(`/togarak/${id}`);
     } catch (err) {
@@ -133,6 +138,32 @@ export default function EditCircle() {
         <div className="grid grid-cols-2 gap-3">
           <input placeholder="Telefon" value={form.contactPhone} onChange={(e) => update("contactPhone", e.target.value)} className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none" />
           <input placeholder="Telegram" value={form.contactTelegram} onChange={(e) => update("contactTelegram", e.target.value)} className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none" />
+        </div>
+
+        <div className="flex flex-col gap-2 border-t border-line pt-4">
+          <p className="text-sm font-medium text-ink-soft">Rasm URL (ixtiyoriy, max 2)</p>
+          <p className="text-xs text-muted">To&apos;liq https://... havola. ImgBB / Cloudinary tavsiya etiladi.</p>
+          {[0, 1].map((idx) => (
+            <input
+              key={idx}
+              type="url"
+              placeholder={`Rasm URL ${idx + 1} — https://...`}
+              value={form.images?.[idx] || ""}
+              onChange={(e) => {
+                const images = [...(form.images || ["", ""])];
+                images[idx] = e.target.value;
+                update("images", images);
+              }}
+              className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+            />
+          ))}
+          {(form.images || []).some((u) => u && u.startsWith("http")) && (
+            <div className="flex gap-2">
+              {(form.images || []).filter((u) => u && u.startsWith("http")).map((url, i) => (
+                <img key={i} src={url} alt="" className="h-20 w-20 rounded-lg object-cover border border-line" />
+              ))}
+            </div>
+          )}
         </div>
 
         <button type="submit" disabled={saving} className="mt-2 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60">
