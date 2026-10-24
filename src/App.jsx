@@ -20,6 +20,7 @@ import MyCourseCenters from "./pages/MyCourseCenters.jsx";
 import Profile from "./pages/Profile.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import ComparePage from "./pages/ComparePage.jsx";
+import MapPage from "./pages/MapPage.jsx";
 import { NotFound } from "./pages/ErrorPage.jsx";
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/kirish" element={<Login />} />
                 <Route path="/royxatdan-otish" element={<Register />} />
                 <Route path="/taqqoslash" element={<ComparePage />} />
+                <Route path="/xarita" element={<MapPage />} />
 
                 <Route path="/togarak/:id" element={<CircleDetail />} />
                 <Route path="/markaz/:id" element={<CourseCenterDetail />} />

@@ -51,12 +51,18 @@ export default function Navbar() {
           <span className="font-display text-lg font-extrabold tracking-tight text-ink">Velox</span>
         </Link>
 
-        <nav className="hidden md:block">
+        <nav className="hidden md:flex items-center gap-1">
           <Link
             to="/taqqoslash"
             className="rounded-full px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-primary-wash hover:text-primary"
           >
             ⚖ {t("nav.compare")}
+          </Link>
+          <Link
+            to="/xarita"
+            className="rounded-full px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-primary-wash hover:text-primary"
+          >
+            📍 {t("nav.map")}
           </Link>
         </nav>
 

@@ -1,6 +1,7 @@
 {
   "nav": {
     "compare": "Compare",
+    "map": "Map",
     "create": "Create Circle",
     "login": "Login",
     "register": "Sign Up",
@@ -24,6 +25,16 @@
     "error": "Search error. Check your internet and try again.",
     "empty": "Nothing found",
     "emptyDesc": "Try different keywords or filters."
+  },
+  "map": {
+    "title": "Nearby circles",
+    "addressLabel": "Enter address",
+    "addressPlaceholder": "e.g., Tashkent, Chilanzar",
+    "changeLocation": "Change location",
+    "radius": "Search radius",
+    "noResults": "No circles found in this radius",
+    "found": "circles found",
+    "youAreHere": "You are here"
   },
   "directions": "Directions",
   "addToCompare": "Add to Compare",

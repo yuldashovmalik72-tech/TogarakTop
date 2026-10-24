@@ -1,6 +1,7 @@
 {
   "nav": {
     "compare": "Solishtirish",
+    "map": "Xarita",
     "create": "To'garak yaratish",
     "login": "Kirish",
     "register": "Ro'yxatdan o'tish",
@@ -24,6 +25,16 @@
     "error": "Qidiruvda xatolik yuz berdi. Internetni tekshirib, qayta urinib ko'ring.",
     "empty": "Hech narsa topilmadi",
     "emptyDesc": "Boshqa kalit so'z yoki filtr bilan qayta urinib ko'ring."
+  },
+  "map": {
+    "title": "Yaqin atrofdagi to'garaklar",
+    "addressLabel": "Manzilni kiriting",
+    "addressPlaceholder": "Masalan: Toshkent, Chilonzor",
+    "changeLocation": "Joylashuvni o'zgartirish",
+    "radius": "Qidiruv radiusi",
+    "noResults": "Bu radiusda to'garak topilmadi",
+    "found": "ta to'garak topildi",
+    "youAreHere": "Siz shu yerdasiz"
   },
   "directions": "Yo'nalishlar",
   "addToCompare": "Solishtirishga qo'shish",
