@@ -2,25 +2,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 @theme {
-  /* Asosiy - "gumbaz ko'ki" dan ilhomlangan chuqur zangori-yashil */
-  --color-ink: #14201d;
-  --color-ink-soft: #3c4a45;
-  --color-muted: #5b6b66;
+  /* Dark mode — jiddiy, minimal oq, ko'zga qulay */
+  --color-ink: #e2e8f0;
+  --color-ink-soft: #94a3b8;
+  --color-muted: #64748b;
 
-  --color-paper: #f5f8f6;
-  --color-paper-raised: #ffffff;
-  --color-line: #dde6e1;
+  --color-paper: #1a1f2e;
+  --color-paper-raised: #242938;
+  --color-line: #334155;
 
-  --color-primary: #0f6b5c;
-  --color-primary-dark: #0a4f44;
-  --color-primary-wash: #e7f3ef;
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+  --color-primary-wash: #1e3a5f;
 
-  --color-accent: #e8a33d;
-  --color-accent-dark: #c97f1e;
-  --color-accent-wash: #fbeed9;
+  --color-accent: #f59e0b;
+  --color-accent-dark: #d97706;
+  --color-accent-wash: #451a03;
 
-  --color-danger: #c0432f;
-  --color-danger-wash: #f8e8e5;
+  --color-danger: #ef4444;
+  --color-danger-wash: #450a0a;
 
   --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -50,6 +50,12 @@ h1, h2, h3, h4, .font-display {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Dark Glassmorphism sahifadagi select ochiladigan ro'yxati ham qorong'u bo'lishi uchun */
+.dark-select option {
+  background-color: #0c1310;
+  color: #e5e7eb;
 }
 
 @media (prefers-reduced-motion: reduce) {

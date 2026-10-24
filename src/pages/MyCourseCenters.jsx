@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import api from "../lib/api.js";
 import { useToast, errorMessage } from "../context/ToastContext.jsx";
 import { Spinner, EmptyState } from "../components/Spinner.jsx";
+import FileUploadField from "../components/FileUploadField.jsx";
 
 export default function MyCourseCenters() {
   const { push } = useToast();
   const [centers, setCenters] = useState(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: "", address: "", contactPhone: "", contactTelegram: "" });
+  const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   function load() {
@@ -23,9 +25,11 @@ export default function MyCourseCenters() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => v && fd.append(k, v));
+      images.slice(0, 2).forEach((f) => fd.append("images", f));
       await api.post("/course-centers", fd);
       push("Markaz yaratildi");
       setForm({ name: "", address: "", contactPhone: "", contactTelegram: "" });
+      setImages([]);
       setAdding(false);
       load();
     } catch (err) {
@@ -54,6 +58,14 @@ export default function MyCourseCenters() {
             <input placeholder="Telefon" value={form.contactPhone} onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))} className="rounded-lg border border-line px-3 py-2 text-sm focus:border-primary focus:outline-none" />
             <input placeholder="Telegram" value={form.contactTelegram} onChange={(e) => setForm((f) => ({ ...f, contactTelegram: e.target.value }))} className="rounded-lg border border-line px-3 py-2 text-sm focus:border-primary focus:outline-none" />
           </div>
+          <FileUploadField
+            kind="image"
+            accept="image/*"
+            multiple
+            value={images}
+            onChange={(e) => setImages(Array.from(e.target.files || []))}
+            hint="Rasm (max 2) — ImgBB bulutiga yuklanadi"
+          />
           <div className="flex gap-2">
             <button onClick={submit} disabled={submitting} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
               {submitting ? "Yaratilmoqda..." : "Yaratish"}

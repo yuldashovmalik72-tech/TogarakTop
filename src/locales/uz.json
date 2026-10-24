@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "compare": "Solishtirish",
+    "create": "To'garak yaratish",
+    "login": "Kirish",
+    "register": "Ro'yxatdan o'tish",
+    "profile": "Profil",
+    "myCircles": "Mening to'garaklarim",
+    "myCenters": "O'quv markazlarim",
+    "admin": "Admin panel",
+    "logout": "Chiqish"
+  },
+  "home": {
+    "title": "Farzandingiz uchun to'g'ri to'garakni toping",
+    "subtitle": "Ingliz tilidan shaxmatgacha — yaqiningizdagi va onlayn to'garaklarni bir joydan qidiring, solishtiring, tanlang.",
+    "searchPlaceholder": "Masalan: ingliz tili, shaxmat, dasturlash...",
+    "all": "Barchasi",
+    "atHome": "Uyda",
+    "online": "Onlayn",
+    "courseCenter": "O'quv markazi",
+    "aiCompare": "AI Arbitr — 2 ta to'garakni solishtiring",
+    "found": "ta to'garak topildi",
+    "loading": "To'garaklar qidirilmoqda...",
+    "error": "Qidiruvda xatolik yuz berdi. Internetni tekshirib, qayta urinib ko'ring.",
+    "empty": "Hech narsa topilmadi",
+    "emptyDesc": "Boshqa kalit so'z yoki filtr bilan qayta urinib ko'ring."
+  },
+  "directions": "Yo'nalishlar",
+  "addToCompare": "Solishtirishga qo'shish",
+  "free": "Bepul",
+  "negotiable": "Kelishilgan holda",
+  "perMonth": "so'm/oy"
+}

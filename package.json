@@ -1,5 +1,5 @@
 {
-  "name": "togarak-frontend",
+  "name": "velox-frontend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
+    "i18next": "^26.5.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.1.6",
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {

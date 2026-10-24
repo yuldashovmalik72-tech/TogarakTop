@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api.js";
 import { CATEGORY_OPTIONS, DAYS } from "../lib/format.js";
+import FileUploadField from "../components/FileUploadField.jsx";
 
 const STEPS = ["Turi", "Asosiy", "Rasm", "Narx", "Manzil", "Guruh", "Tayyor"];
 
@@ -19,6 +20,9 @@ const emptyForm = {
   priceAmount: "",
   currency: "UZS",
   pricePeriod: "MONTHLY",
+  materialsIncluded: "",
+  refundable: "",
+  extraCostsNote: "",
   address: "",
   ageGroupMin: "",
   ageGroupMax: "",
@@ -27,6 +31,33 @@ const emptyForm = {
 };
 
 const emptyGroup = { teacherName: "", teacherBio: "", maxStudents: "", schedule: [] };
+
+function YesNoRow({ label, value, onChange }) {
+  const options = [
+    { v: "true", l: "Ha" },
+    { v: "false", l: "Yo'q" },
+    { v: "", l: "Aytmayman" },
+  ];
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <span className="text-sm text-ink-soft">{label}</span>
+      <div className="flex gap-1.5">
+        {options.map((o) => (
+          <button
+            key={o.v}
+            type="button"
+            onClick={() => onChange(o.v)}
+            className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
+              value === o.v ? "border-primary bg-primary-wash text-primary" : "border-line text-ink-soft"
+            }`}
+          >
+            {o.l}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function CreateCircle() {
   const navigate = useNavigate();
@@ -73,6 +104,14 @@ export default function CreateCircle() {
     setForm((f) => {
       const images = [...(f.images || [])];
       images[idx] = value;
+      return { ...f, images };
+    });
+  }
+
+  function setImageFile(idx, file) {
+    setForm((f) => {
+      const images = [...(f.images || [])];
+      images[idx] = file;
       return { ...f, images };
     });
   }
@@ -134,13 +173,21 @@ export default function CreateCircle() {
         fd.append("currency", form.currency);
         fd.append("pricePeriod", form.pricePeriod);
       }
+      fd.append("materialsIncluded", form.materialsIncluded);
+      fd.append("refundable", form.refundable);
+      if (form.extraCostsNote) fd.append("extraCostsNote", form.extraCostsNote);
       if (form.address) fd.append("address", form.address);
       if (form.ageGroupMin) fd.append("ageGroupMin", form.ageGroupMin);
       if (form.ageGroupMax) fd.append("ageGroupMax", form.ageGroupMax);
       if (form.contactPhone) fd.append("contactPhone", form.contactPhone);
       if (form.contactTelegram) fd.append("contactTelegram", form.contactTelegram);
       if (form.type === "KURS") fd.append("courseCenterId", form.courseCenterId);
-      const imageUrls = (form.images || []).map((u) => (u || "").trim()).filter((u) => /^https?:\/\//i.test(u));
+      const imageFiles = (form.images || []).filter((v) => v instanceof File);
+      imageFiles.forEach((f) => fd.append("images", f));
+      const imageUrls = (form.images || [])
+        .filter((v) => typeof v === "string")
+        .map((u) => u.trim())
+        .filter((u) => /^https?:\/\//i.test(u));
       if (imageUrls.length) fd.append("imageUrls", JSON.stringify(imageUrls));
 
       const res = await api.post("/circles", fd);
@@ -335,33 +382,45 @@ export default function CreateCircle() {
           </div>
         )}
 
-        {/* 2. RASM — URL (Render free uchun fayl o'rniga) */}
+        {/* 2. RASM — fayl (backend ImgBB ga yuklaydi) yoki URL */}
         {step === 2 && (
           <div className="flex flex-col gap-4">
             <h2 className="font-display text-lg font-bold text-ink">Rasmlar (ixtiyoriy)</h2>
             <p className="text-sm text-muted">
-              Rasmni ImgBB, Cloudinary yoki boshqa joyga yuklab, <strong>to&apos;liq https://...</strong> havolasini kiriting.
-              Maksimum 2 ta. Render free diskda fayl saqlanmaydi — shu sabab URL ishlatiladi.
+              Rasmni tanlasangiz, server uni ImgBB bulutiga yuklab doimiy havola qilib qo&apos;yadi
+              (yoki quyida to&apos;liq https://... havolani qo&apos;lda kiriting). Maksimum 2 ta.
             </p>
-            {[0, 1].map((idx) => (
-              <label key={idx} className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-ink-soft">Rasm URL {idx + 1}</span>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={form.images[idx] || ""}
-                  onChange={(e) => setImageUrl(idx, e.target.value)}
-                  className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
-                />
-              </label>
-            ))}
-            {(form.images || []).some((u) => u && /^https?:\/\//i.test(u)) && (
-              <div className="flex gap-3">
-                {(form.images || []).filter((u) => u && /^https?:\/\//i.test(u)).map((url, i) => (
-                  <img key={i} src={url} alt="" className="h-24 w-24 rounded-xl object-cover border border-line" />
-                ))}
-              </div>
-            )}
+            {[0, 1].map((idx) => {
+              const slot = form.images[idx];
+              const isFile = slot instanceof File;
+              const preview = isFile ? URL.createObjectURL(slot) : typeof slot === "string" && slot ? slot : null;
+              return (
+                <div key={idx} className="flex flex-col gap-2 rounded-xl border border-line p-3">
+                  <span className="text-sm font-medium text-ink-soft">Rasm {idx + 1}</span>
+                  <FileUploadField
+                    kind="image"
+                    accept="image/*"
+                    value={isFile ? slot : null}
+                    onChange={(e) => {
+                      setImageFile(idx, e.target.files?.[0] || null);
+                      e.target.value = "";
+                    }}
+                    hint="Yuklanmagan"
+                  />
+                  <span className="text-center text-xs text-muted">yoki</span>
+                  <input
+                    type="url"
+                    placeholder="https://... (havola bilan qo'shish)"
+                    value={isFile ? "" : slot || ""}
+                    onChange={(e) => setImageUrl(idx, e.target.value)}
+                    className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  />
+                  {preview && (
+                    <img src={preview} alt="" className="h-24 w-24 rounded-xl object-cover border border-line" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -417,6 +476,31 @@ export default function CreateCircle() {
                 </select>
               </div>
             )}
+
+            <div className="flex flex-col gap-3 rounded-xl border border-line bg-paper p-4">
+              <div>
+                <p className="text-sm font-medium text-ink-soft">To'liq yakuniy narx (shaffoflik uchun)</p>
+                <p className="mt-0.5 text-xs text-muted">
+                  Ota-onalar yashirin to'lovlardan eng ko'p shikoyat qiladi — ochiq yozsangiz ishonch oshadi.
+                </p>
+              </div>
+              <YesNoRow
+                label="Kitob/materiallar narxga kiritilganmi?"
+                value={form.materialsIncluded}
+                onChange={(v) => update("materialsIncluded", v)}
+              />
+              <YesNoRow
+                label="O'tkazib yuborilgan dars puli qaytariladimi?"
+                value={form.refundable}
+                onChange={(v) => update("refundable", v)}
+              />
+              <input
+                value={form.extraCostsNote}
+                onChange={(e) => update("extraCostsNote", e.target.value)}
+                placeholder="Boshqa qo'shimcha to'lovlar (masalan: forma kiyimi 100 000 so'm alohida)"
+                className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+              />
+            </div>
           </div>
         )}
 

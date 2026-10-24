@@ -31,6 +31,8 @@ export default function CourseCenterDetail() {
   if (!center) return <Spinner />;
 
   const isOwner = user && center.ownerId === user.id;
+  const groups = (center.circles || []).flatMap((c) => c.groups || []);
+  const teachers = [...new Set(groups.map((g) => g.teacherName).filter(Boolean))];
 
   function startEdit() {
     setDraft({
@@ -122,6 +124,16 @@ export default function CourseCenterDetail() {
 
         {center.description && !editing && (
           <p className="mt-4 whitespace-pre-line text-sm text-ink-soft">{center.description}</p>
+        )}
+
+        {teachers.length > 0 && !editing && (
+          <div className="mt-4 rounded-xl bg-primary-wash p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">👥 Ustozlar jamoasi</p>
+            <p className="mt-0.5 text-sm font-semibold text-ink">
+              {teachers.length} nafar ustoz, {groups.length} ta guruh
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{teachers.join(" · ")}</p>
+          </div>
         )}
       </div>
 

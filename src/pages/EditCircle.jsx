@@ -4,6 +4,12 @@ import api from "../lib/api.js";
 import { useToast, errorMessage } from "../context/ToastContext.jsx";
 import { Spinner } from "../components/Spinner.jsx";
 import { CATEGORY_OPTIONS } from "../lib/format.js";
+import FileUploadField from "../components/FileUploadField.jsx";
+
+const TEXT_FIELDS = [
+  "name", "category", "direction", "description", "tavsif", "address", "ageGroupMin", "ageGroupMax",
+  "contactPhone", "contactTelegram", "priceType", "priceAmount", "currency", "pricePeriod",
+];
 
 export default function EditCircle() {
   const { id } = useParams();
@@ -11,12 +17,14 @@ export default function EditCircle() {
   const { push } = useToast();
 
   const [form, setForm] = useState(null);
+  const [originalImages, setOriginalImages] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     api.get(`/circles/${id}`).then((res) => {
       const c = res.data.data;
+      setOriginalImages(c.images || []);
       setForm({
         name: c.name,
         category: c.category,
@@ -32,6 +40,9 @@ export default function EditCircle() {
         priceAmount: c.priceAmount || "",
         currency: c.currency || "UZS",
         pricePeriod: c.pricePeriod || "MONTHLY",
+        materialsIncluded: c.materialsIncluded === null || c.materialsIncluded === undefined ? "" : String(c.materialsIncluded),
+        refundable: c.refundable === null || c.refundable === undefined ? "" : String(c.refundable),
+        extraCostsNote: c.extraCostsNote || "",
         images: [...(c.images || []), "", ""].slice(0, 2),
       });
     }).catch(() => setError("To'garak topilmadi"));
@@ -46,11 +57,25 @@ export default function EditCircle() {
     setSaving(true);
     setError("");
     try {
-      const payload = {
-        ...form,
-        images: (form.images || []).map((u) => (u || "").trim()).filter(Boolean).slice(0, 2),
-      };
-      await api.patch(`/circles/${id}`, payload);
+      const fd = new FormData();
+      TEXT_FIELDS.forEach((k) => {
+        if (form[k] !== undefined && form[k] !== null) fd.append(k, form[k]);
+      });
+      fd.append("materialsIncluded", form.materialsIncluded);
+      fd.append("refundable", form.refundable);
+      fd.append("extraCostsNote", form.extraCostsNote);
+      const imageFiles = (form.images || []).filter((v) => v instanceof File);
+      imageFiles.forEach((f) => fd.append("images", f));
+      const urlSlots = (form.images || [])
+        .filter((v) => typeof v === "string")
+        .map((u) => u.trim())
+        .filter(Boolean);
+      if (urlSlots.length) fd.append("imageUrls", JSON.stringify(urlSlots));
+      // Slotdan olib tashlangan eski rasmlarni serverda ham o'chirish
+      const dropped = originalImages.filter((u) => !urlSlots.includes(u));
+      if (dropped.length) fd.append("removeImages", JSON.stringify(dropped));
+
+      await api.patch(`/circles/${id}`, fd);
       push("O'zgarishlar saqlandi, qayta moderatsiyaga yuborildi");
       navigate(`/togarak/${id}`);
     } catch (err) {
@@ -126,6 +151,36 @@ export default function EditCircle() {
           </div>
         )}
 
+        <div className="flex flex-col gap-3 rounded-xl border border-line bg-paper p-4">
+          <div>
+            <p className="text-sm font-medium text-ink-soft">To'liq yakuniy narx (shaffoflik uchun)</p>
+            <p className="mt-0.5 text-xs text-muted">Ota-onalar yashirin to'lovlardan eng ko'p shikoyat qiladi — ochiq yozsangiz ishonch oshadi.</p>
+          </div>
+          {[{ f: "materialsIncluded", l: "Kitob/materiallar narxga kiritilganmi?" }, { f: "refundable", l: "O'tkazib yuborilgan dars puli qaytariladimi?" }].map((row) => (
+            <div key={row.f} className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm text-ink-soft">{row.l}</span>
+              <div className="flex gap-1.5">
+                {[{ v: "true", l: "Ha" }, { v: "false", l: "Yo'q" }, { v: "", l: "Aytmayman" }].map((o) => (
+                  <button
+                    key={o.v}
+                    type="button"
+                    onClick={() => update(row.f, o.v)}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition ${form[row.f] === o.v ? "border-primary bg-primary-wash text-primary" : "border-line text-ink-soft"}`}
+                  >
+                    {o.l}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <input
+            value={form.extraCostsNote}
+            onChange={(e) => update("extraCostsNote", e.target.value)}
+            placeholder="Boshqa qo'shimcha to'lovlar (masalan: forma kiyimi 100 000 so'm alohida)"
+            className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+          />
+        </div>
+
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-ink-soft">Manzil</span>
           <input value={form.address} onChange={(e) => update("address", e.target.value)} className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none" />
@@ -141,29 +196,44 @@ export default function EditCircle() {
         </div>
 
         <div className="flex flex-col gap-2 border-t border-line pt-4">
-          <p className="text-sm font-medium text-ink-soft">Rasm URL (ixtiyoriy, max 2)</p>
-          <p className="text-xs text-muted">To&apos;liq https://... havola. ImgBB / Cloudinary tavsiya etiladi.</p>
-          {[0, 1].map((idx) => (
-            <input
-              key={idx}
-              type="url"
-              placeholder={`Rasm URL ${idx + 1} — https://...`}
-              value={form.images?.[idx] || ""}
-              onChange={(e) => {
-                const images = [...(form.images || ["", ""])];
-                images[idx] = e.target.value;
-                update("images", images);
-              }}
-              className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
-            />
-          ))}
-          {(form.images || []).some((u) => u && u.startsWith("http")) && (
-            <div className="flex gap-2">
-              {(form.images || []).filter((u) => u && u.startsWith("http")).map((url, i) => (
-                <img key={i} src={url} alt="" className="h-20 w-20 rounded-lg object-cover border border-line" />
-              ))}
-            </div>
-          )}
+          <p className="text-sm font-medium text-ink-soft">Rasmlar (ixtiyoriy, max 2)</p>
+          <p className="text-xs text-muted">Fayl tanlasangiz server uni ImgBB bulutiga yuklaydi yoki to&apos;liq https://... havola qoldiring.</p>
+          {[0, 1].map((idx) => {
+            const slot = form.images?.[idx];
+            const isFile = slot instanceof File;
+            const preview = isFile ? URL.createObjectURL(slot) : typeof slot === "string" && slot ? slot : null;
+            return (
+              <div key={idx} className="flex flex-col gap-2 rounded-xl border border-line p-3">
+                <FileUploadField
+                  kind="image"
+                  accept="image/*"
+                  size="sm"
+                  value={isFile ? slot : null}
+                  onChange={(e) => {
+                    const images = [...(form.images || ["", ""])];
+                    images[idx] = e.target.files?.[0] || "";
+                    update("images", images);
+                    e.target.value = "";
+                  }}
+                  hint={`Rasm ${idx + 1} — yuklanmagan`}
+                />
+                <input
+                  type="url"
+                  placeholder={`yoki havola ${idx + 1} — https://...`}
+                  value={isFile ? "" : slot || ""}
+                  onChange={(e) => {
+                    const images = [...(form.images || ["", ""])];
+                    images[idx] = e.target.value;
+                    update("images", images);
+                  }}
+                  className="rounded-xl border border-line px-3.5 py-2.5 text-sm focus:border-primary focus:outline-none"
+                />
+                {preview && (
+                  <img src={preview} alt="" className="h-20 w-20 rounded-lg object-cover border border-line" />
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <button type="submit" disabled={saving} className="mt-2 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60">

@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../lib/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast, errorMessage } from "../context/ToastContext.jsx";
+import { useCompare } from "../context/CompareContext.jsx";
 import { Spinner, EmptyState } from "../components/Spinner.jsx";
 import TypeBadge from "../components/TypeBadge.jsx";
 import StatusPill from "../components/StatusPill.jsx";
@@ -11,6 +12,7 @@ import GroupManager from "../components/GroupManager.jsx";
 import ResultManager from "../components/ResultManager.jsx";
 import VideoTourPanel from "../components/VideoTourPanel.jsx";
 import StatsPanel from "../components/StatsPanel.jsx";
+import TrialLessonModal from "../components/TrialLessonModal.jsx";
 import { formatPrice, imageUrl, CIRCLE_STATUS_LABELS } from "../lib/format.js";
 
 export default function CircleDetail() {
@@ -18,11 +20,13 @@ export default function CircleDetail() {
   const { user } = useAuth();
   const { push } = useToast();
   const navigate = useNavigate();
+  const { toggle, isActive } = useCompare();
 
   const [circle, setCircle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeImg, setActiveImg] = useState(0);
+  const [trialOpen, setTrialOpen] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -44,6 +48,11 @@ export default function CircleDetail() {
   const isAdmin = user?.role === "ADMIN";
   const canManage = isOwner || isAdmin;
   const images = circle.images || [];
+  const teachers = [...new Set((circle.groups || []).map((g) => g.teacherName).filter(Boolean))];
+  const hasCostInfo =
+    circle.materialsIncluded !== null ||
+    circle.refundable !== null ||
+    Boolean(circle.extraCostsNote);
 
   async function deleteCircle() {
     try {
@@ -178,7 +187,32 @@ export default function CircleDetail() {
               </Link>
             )}
 
+            {teachers.length > 0 && (
+              <div className="mt-4 rounded-xl bg-primary-wash p-3.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">👥 Ustozlar jamoasi</p>
+                <p className="mt-0.5 text-sm font-semibold text-ink">
+                  {teachers.length} nafar ustoz, {circle.groups.length} ta guruh
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">{teachers.join(" · ")}</p>
+              </div>
+            )}
+
             <p className="mt-4 font-mono text-xl font-bold text-primary">{formatPrice(circle)}</p>
+
+            {hasCostInfo && (
+              <div className="mt-3 rounded-xl border border-line bg-paper p-3.5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">To'liq yakuniy narx</p>
+                <ul className="mt-2 flex flex-col gap-1 text-sm text-ink-soft">
+                  {circle.materialsIncluded !== null && (
+                    <li>{circle.materialsIncluded ? "✓ Kitob/materiallar narxga kiritilgan" : "✗ Kitob/materiallar alohida to'lanadi"}</li>
+                  )}
+                  {circle.refundable !== null && (
+                    <li>{circle.refundable ? "✓ O'tkazib yuborilgan dars puli qaytariladi" : "✗ To'lov qaytarilmaydi"}</li>
+                  )}
+                  {circle.extraCostsNote && <li className="text-muted">{circle.extraCostsNote}</li>}
+                </ul>
+              </div>
+            )}
 
             <dl className="mt-5 flex flex-col gap-3 border-t border-line pt-4 text-sm">
               {circle.address && (
@@ -196,6 +230,13 @@ export default function CircleDetail() {
             </dl>
 
             <div className="mt-5 flex flex-col gap-2 border-t border-line pt-4">
+              <button
+                onClick={() => setTrialOpen(true)}
+                className="rounded-xl bg-accent py-3 text-sm font-bold text-ink transition hover:brightness-95"
+              >
+                🎯 Sinov darsiga yozilish
+              </button>
+              <p className="text-center text-[11px] text-muted">Bepul daraja aniqlash testi (Placement Test)</p>
               {circle.contactPhone && (
                 <a href={`tel:${circle.contactPhone}`} className="rounded-xl bg-primary py-2.5 text-center text-sm font-semibold text-white transition hover:bg-primary-dark">
                   📞 {circle.contactPhone}
@@ -214,10 +255,22 @@ export default function CircleDetail() {
               {!circle.contactPhone && !circle.contactTelegram && (
                 <p className="text-center text-sm text-muted">Aloqa ma'lumoti kiritilmagan</p>
               )}
+              <button
+                onClick={() => toggle(circle)}
+                className={`rounded-xl border py-2.5 text-sm font-semibold transition ${
+                  isActive(circle.id)
+                    ? "border-primary/50 bg-primary-wash text-primary"
+                    : "border-line text-ink-soft hover:border-primary/40 hover:text-primary"
+                }`}
+              >
+                {isActive(circle.id) ? "✓ Solishtirishda tanlangan" : "⚖ Solishtirishga qo'shish"}
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {trialOpen && <TrialLessonModal circle={circle} onClose={() => setTrialOpen(false)} />}
     </div>
   );
 }

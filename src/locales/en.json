@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "compare": "Compare",
+    "create": "Create Circle",
+    "login": "Login",
+    "register": "Sign Up",
+    "profile": "Profile",
+    "myCircles": "My Circles",
+    "myCenters": "My Centers",
+    "admin": "Admin Panel",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "Find the right circle for your child",
+    "subtitle": "From English to chess — search, compare, and choose nearby and online circles in one place.",
+    "searchPlaceholder": "e.g., English, chess, programming...",
+    "all": "All",
+    "atHome": "At Home",
+    "online": "Online",
+    "courseCenter": "Course Center",
+    "aiCompare": "AI Arbitr — compare 2 circles",
+    "found": "circles found",
+    "loading": "Searching circles...",
+    "error": "Search error. Check your internet and try again.",
+    "empty": "Nothing found",
+    "emptyDesc": "Try different keywords or filters."
+  },
+  "directions": "Directions",
+  "addToCompare": "Add to Compare",
+  "free": "Free",
+  "negotiable": "Negotiable",
+  "perMonth": "UZS/month"
+}
