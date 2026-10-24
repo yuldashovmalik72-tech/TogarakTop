@@ -40,6 +40,17 @@ export default function CircleCard({ circle }) {
         {circle.courseCenter && (
           <p className="text-sm text-muted">{circle.courseCenter.name}</p>
         )}
+        {circle.avgRating > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-sm font-bold text-amber-400">{circle.avgRating.toFixed(1)}</span>
+            <div className="flex text-amber-400">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <span key={s} className={`text-xs ${s <= Math.round(circle.avgRating) ? "text-amber-400" : "text-muted/30"}`}>★</span>
+              ))}
+            </div>
+            <span className="text-xs text-muted">({circle.reviewCount})</span>
+          </div>
+        )}
         <div className="mt-auto flex items-center justify-between gap-2 pt-2">
           <span className="font-mono text-sm font-semibold text-primary">{formatPrice(circle)}</span>
           {circle.address && <span className="max-w-[45%] truncate text-xs text-muted">{circle.address}</span>}

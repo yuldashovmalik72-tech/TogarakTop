@@ -30,7 +30,7 @@ export default function Home() {
   }, [t]);
 
   useEffect(() => {
-    runSearch({});
+    runSearch({ sort: "rating" });
   }, [runSearch]);
 
   // Debounced query for text search
@@ -46,6 +46,7 @@ export default function Home() {
       query: debouncedQuery || undefined,
       type: type || undefined,
       category: category || undefined,
+      sort: "rating",
     });
   }, [debouncedQuery, type, category, runSearch]);
 

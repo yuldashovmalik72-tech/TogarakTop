@@ -164,11 +164,15 @@ export default function CircleDetail() {
             />
           </div>
 
-          {(circle.groups || []).filter((g) => g.teacherName).map((group) => (
-            <div key={group.id} className="mt-6">
-              <ReviewSection groupId={group.id} teacherName={group.teacherName} />
-            </div>
-          ))}
+          <div className="mt-8">
+            <ReviewSection
+              circleId={circle.id}
+              avgRating={circle.avgRating}
+              reviewCount={circle.reviewCount}
+              distribution={circle.ratingDistribution}
+              reviews={circle.reviews}
+            />
+          </div>
 
           <div className="mt-8">
             <h2 className="mb-3 font-display text-lg font-bold text-ink">O'quvchilar natijalari</h2>
@@ -192,6 +196,18 @@ export default function CircleDetail() {
               <Link to={`/markaz/${circle.courseCenter.id}`} className="mt-2 block text-sm font-medium text-primary hover:underline">
                 {circle.courseCenter.name} →
               </Link>
+            )}
+
+            {circle.avgRating > 0 && (
+              <div className="mt-3 flex items-center gap-2">
+                <span className="font-mono text-lg font-bold text-amber-400">{circle.avgRating.toFixed(1)}</span>
+                <div className="flex text-amber-400">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <span key={s} className={s <= Math.round(circle.avgRating) ? "text-amber-400" : "text-muted/30"}>★</span>
+                  ))}
+                </div>
+                <span className="text-xs text-muted">({circle.reviewCount})</span>
+              </div>
             )}
 
             {teachers.length > 0 && (
