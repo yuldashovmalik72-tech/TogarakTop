@@ -41,7 +41,7 @@ export default function MapPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const mapRef = useRef(null);
 
-  const fetchNearby = useCallback(async (lat, lng, rad) => {
+  const fetchNearby = useCallback(async (lat, lng, rad, retryCount = 0) => {
     setLoading(true);
     setError("");
     try {
@@ -49,7 +49,12 @@ export default function MapPage() {
         params: { lat, lng, radiusKm: rad, sort: "nearest", limit: 50 },
       });
       setItems(res.data.data.items);
-    } catch {
+    } catch (err) {
+      // Render cold start uchun bir marta avtomatik retry
+      if (retryCount === 0 && (err.code === "ECONNABORTED" || err.message?.includes("timeout"))) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return fetchNearby(lat, lng, rad, 1);
+      }
       setError(t("home.error"));
     } finally {
       setLoading(false);
