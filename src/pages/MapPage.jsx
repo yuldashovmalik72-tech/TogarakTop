@@ -216,8 +216,14 @@ export default function MapPage() {
             )}
 
             {error && !loading && (
-              <div className="rounded-xl border border-danger/20 bg-danger-wash p-3 text-sm text-danger">
-                {error}
+              <div className="rounded-xl border border-danger/20 bg-danger-wash p-3">
+                <p className="text-sm text-danger">{error}</p>
+                <button
+                  onClick={() => location && fetchNearby(location.lat, location.lng, radius)}
+                  className="mt-2 rounded-lg bg-danger/10 px-3 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger/20"
+                >
+                  🔄 Qayta urinish
+                </button>
               </div>
             )}
 
