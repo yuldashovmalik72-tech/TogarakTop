@@ -13,6 +13,7 @@ import ResultManager from "../components/ResultManager.jsx";
 import VideoTourPanel from "../components/VideoTourPanel.jsx";
 import StatsPanel from "../components/StatsPanel.jsx";
 import TrialLessonModal from "../components/TrialLessonModal.jsx";
+import ReviewSection from "../components/ReviewSection.jsx";
 import { formatPrice, imageUrl, CIRCLE_STATUS_LABELS } from "../lib/format.js";
 
 export default function CircleDetail() {
@@ -162,6 +163,12 @@ export default function CircleDetail() {
               onChange={load}
             />
           </div>
+
+          {(circle.groups || []).filter((g) => g.teacherName).map((group) => (
+            <div key={group.id} className="mt-6">
+              <ReviewSection groupId={group.id} teacherName={group.teacherName} />
+            </div>
+          ))}
 
           <div className="mt-8">
             <h2 className="mb-3 font-display text-lg font-bold text-ink">O'quvchilar natijalari</h2>
