@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component {
         <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
           <div className="mb-6 flex items-center gap-2 opacity-80">
             <BrandMark size={32} />
-            <span className="font-display text-xl font-extrabold text-ink">Velox</span>
+            <span className="font-display text-xl font-extrabold text-ink">PathFinder</span>
           </div>
 
           <p className="font-mono text-6xl font-bold tracking-tight text-danger/30 sm:text-7xl">

@@ -48,7 +48,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
           <BrandMark size={26} />
-          <span className="font-display text-lg font-extrabold tracking-tight text-ink">Velox</span>
+          <span className="font-display text-lg font-extrabold tracking-tight text-ink">PathFinder</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
