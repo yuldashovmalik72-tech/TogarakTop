@@ -245,12 +245,12 @@ export default function ComparePage() {
   }, [result]);
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#070b0a] text-white">
-      {/* Fon nurli dog'lar (Cyber-Glass muhiti) */}
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#1e293b] text-white">
+      {/* Fon nurli dog'lar */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]" />
-        <div className="absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-amber-400/10 blur-[110px]" />
-        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-teal-400/10 blur-[100px]" />
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px]" />
+        <div className="absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-purple-500/10 blur-[110px]" />
+        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-indigo-400/10 blur-[100px]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
