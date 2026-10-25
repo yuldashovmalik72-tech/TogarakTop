@@ -72,6 +72,9 @@ export default function CreateCircle() {
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+    if (field === "type" && value === "KURS" && myCenters === null) {
+      loadMyCenters();
+    }
   }
 
   async function loadMyCenters() {
@@ -87,7 +90,6 @@ export default function CreateCircle() {
     setError("");
     if (step === 0) {
       if (!form.type) return setError("Davom etish uchun turini tanlang");
-      if (form.type === "KURS" && myCenters === null) loadMyCenters();
     }
     if (step === 1 && (!form.name || !form.category || !form.direction || !form.description || !form.tavsif)) {
       return setError("Barcha maydonlarni to'ldiring");
